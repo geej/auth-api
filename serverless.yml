@@ -1,0 +1,67 @@
+service: auth-api
+provider:
+  name: aws
+  runtime: nodejs6.10
+  environment:
+    REGION: ${opt:region, self:provider.region}
+    JWT_SECRET: ${opt:jwt_secret}
+    CIPHER_KEY: ${opt:cipher_key}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: arn:aws:dynamodb:*:*:table/Users
+
+functions:
+  authorize:
+    handler: handler.authorize
+    events:
+      -
+        http:
+          path: oauth/authorize
+          method: post
+  token:
+    handler: handler.token
+    events:
+      -
+        http:
+          path: oauth/token
+          method: post
+  createUser:
+    handler: handler.createUser
+    events:
+      -
+        http:
+          path: users
+          method: post
+resources:
+  Resources:
+    Users:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+#          - AttributeName: username
+#            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+#        GlobalSecondaryIndexes:
+#          -
+#            IndexName: UsernameIndex
+#            KeySchema:
+#              - AttributeName: username
+#                KeyType: HASH
+#            Projection:
+#              ProjectionType: KEYS_ONLY
+#            ProvisionedThroughput:
+#              ReadCapacityUnits: 1
+#              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: Users
