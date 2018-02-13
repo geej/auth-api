@@ -12,11 +12,18 @@ provider:
       Action:
         - dynamodb:GetItem
         - dynamodb:PutItem
-      Resource: arn:aws:dynamodb:*:*:table/Users
+      Resource: arn:aws:dynamodb:*:*:table/Accounts
 
 functions:
-  authorize:
-    handler: handler.authorize
+  serveAuthorizationScreen:
+    handler: handler.serveAuthorizationScreen
+    events:
+      -
+        http:
+          path: oauth/authorize
+          method: get
+  processAuthorization:
+    handler: handler.processAuthorization
     events:
       -
         http:
@@ -29,39 +36,63 @@ functions:
         http:
           path: oauth/token
           method: post
-  createUser:
-    handler: handler.createUser
+  createAccount:
+    handler: handler.createAccount
     events:
       -
         http:
-          path: users
+          path: accounts
           method: post
+  serveNewAccountScreen:
+    handler: handler.serveNewAccountScreen
+    events:
+      -
+        http:
+          path: accounts/new
+          method: get
 resources:
   Resources:
-    Users:
+    Codes:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: Codes
+    Accounts:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
-#          - AttributeName: username
-#            AttributeType: S
+          - AttributeName: username
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-#        GlobalSecondaryIndexes:
-#          -
-#            IndexName: UsernameIndex
-#            KeySchema:
-#              - AttributeName: username
-#                KeyType: HASH
-#            Projection:
-#              ProjectionType: KEYS_ONLY
-#            ProvisionedThroughput:
-#              ReadCapacityUnits: 1
-#              WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: UsernameIndex
+            KeySchema:
+              - AttributeName: username
+                KeyType: HASH
+            Projection:
+              ProjectionType: KEYS_ONLY
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: Users
+        TableName: Accounts

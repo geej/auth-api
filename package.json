@@ -8,5 +8,8 @@
   },
   "author": "me@jeffg.ee",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "cookie": "^0.3.1",
+    "handlebars": "^4.0.11"
+  }
 }

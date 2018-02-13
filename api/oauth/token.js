@@ -1,5 +1,5 @@
 const querystring = require('querystring');
-const user = require('../../util/user');
+const account = require('../../util/account');
 
 module.exports = (event, context, callback) => {
   const body = querystring.parse(event.body);
@@ -17,7 +17,7 @@ module.exports = (event, context, callback) => {
   let tokenPromise;
 
   switch (body.grant_type) {
-    case 'password': tokenPromise = user.handlePasswordGrant(body.username, body.password, body.clientId, body.clientSecret); break;
+    case 'password': tokenPromise = account.handlePasswordGrant(body.username, body.password, body.clientId, body.clientSecret); break;
     case 'authorization_code':
     default:
       callback(null, {
@@ -34,5 +34,9 @@ module.exports = (event, context, callback) => {
       statusCode: 200,
       body: JSON.stringify(hash)
     });
+  }).catch(() => {
+    callback(null, {
+      statusCode: 500
+    })
   });
 };

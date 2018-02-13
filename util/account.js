@@ -1,15 +1,21 @@
 const AWS = require('aws-sdk');
 const crypt = require('./crypt');
 const jwt = require('./jwt');
+const client = require('./client');
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: process.env.REGION });
 
 module.exports.handlePasswordGrant = (username, password, clientId, clientSecret) => {
   return new Promise((res, rej) => {
+    if (!client.isClientIdValid(clientId) || !client.isClientSecretValid(clientSecret)) {
+      rej(new Error('Client secret doesn\'t match!'));
+      return;
+    }
+
     dynamoDB.get({
-      TableName: 'Users',
+      TableName: 'Account',
       Key: {
-        id: username
+        username: username
       }
     }, (err, data) => {
       if (err) {
@@ -37,7 +43,7 @@ module.exports.handlePasswordGrant = (username, password, clientId, clientSecret
         user.auth = crypt.encrypt(JSON.stringify(tokenHash));
 
         dynamoDB.put({
-          TableName: 'Users',
+          TableName: 'Account',
           Item: user
         }, (err) => {
           if (err) {
