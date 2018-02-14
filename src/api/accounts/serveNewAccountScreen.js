@@ -1,8 +1,8 @@
-const fs = require('fs');
-const Path = require('path');
-const Handlebars = require('handlebars');
-const csrf = require('../../util/csrf');
-const qs = require('querystring');
+import fs from 'fs';
+import Path from 'path';
+import Handlebars from 'handlebars';
+import { getCSRFToken } from '../../util/csrf';
+import qs from 'querystring';
 
 module.exports = (event, context, callback) => {
   fs.readFile(Path.join(__dirname, 'newAccountScreen.hbs'), (err, data) => {
@@ -12,7 +12,7 @@ module.exports = (event, context, callback) => {
     }
 
     const template = Handlebars.compile(data.toString('utf8'));
-    const token = csrf.getCSRFToken();
+    const token = getCSRFToken();
 
     callback(null, {
       statusCode: 200,

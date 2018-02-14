@@ -1,16 +1,16 @@
 const fs = require('fs');
 const Path = require('path');
+const qs = require('querystring');
 const Handlebars = require('handlebars');
 const client = require('../../util/client');
 const csrf = require('../../util/csrf');
-const qs = require('querystring');
 
 module.exports = (event, context, callback) => {
-  event.queryStringParameters = event.queryStringParameters || {};
-
-  const responseType = event.queryStringParameters.response_type;
-  const clientId = event.queryStringParameters.client_id;
-  const redirectUri = event.queryStringParameters.redirect_uri;
+  const {
+    response_type: responseType,
+    client_id: clientId,
+    redirect_uri: redirectUri
+  } = event.queryStringParameters || {};
 
   if(responseType !== 'code' || !client.isClientIdValid(clientId) || !client.isRedirectUriValid(clientId, redirectUri)) {
     callback(null, {
@@ -29,6 +29,7 @@ module.exports = (event, context, callback) => {
     }
 
     const template = Handlebars.compile(data.toString('utf8'));
+
     const token = csrf.getCSRFToken();
     callback(null, {
       statusCode: 200,
@@ -38,8 +39,8 @@ module.exports = (event, context, callback) => {
       },
       body: template({
         csrfToken: token,
-        clientId: clientId,
-        redirectUri: redirectUri
+        clientId,
+        redirectUri
       })
     });
   });

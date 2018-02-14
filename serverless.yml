@@ -13,38 +13,43 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
       Resource: arn:aws:dynamodb:*:*:table/Accounts
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: arn:aws:dynamodb:*:*:table/Codes
 
 functions:
   serveAuthorizationScreen:
-    handler: handler.serveAuthorizationScreen
+    handler: dist/handler.serveAuthorizationScreen
     events:
       -
         http:
           path: oauth/authorize
           method: get
   processAuthorization:
-    handler: handler.processAuthorization
+    handler: dist/handler.processAuthorization
     events:
       -
         http:
           path: oauth/authorize
           method: post
   token:
-    handler: handler.token
+    handler: dist/handler.token
     events:
       -
         http:
           path: oauth/token
           method: post
   createAccount:
-    handler: handler.createAccount
+    handler: dist/handler.createAccount
     events:
       -
         http:
           path: accounts
           method: post
   serveNewAccountScreen:
-    handler: handler.serveNewAccountScreen
+    handler: dist/handler.serveNewAccountScreen
     events:
       -
         http:
