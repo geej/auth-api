@@ -1,5 +1,5 @@
 module.exports.clients = {
-  default: {
+  'default': {
     redirectUris: [ 'https://x0r.net' ],
     secret: 'YmFkU2VjcmV0'
   }

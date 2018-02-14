@@ -18,6 +18,10 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
       Resource: arn:aws:dynamodb:*:*:table/Codes
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+      Resource: arn:aws:dynamodb:*:*:table/Accounts/index/AccountNameIndex
 
 functions:
   serveAuthorizationScreen:
@@ -88,12 +92,12 @@ resources:
             KeyType: HASH
         GlobalSecondaryIndexes:
           -
-            IndexName: UsernameIndex
+            IndexName: AccountNameIndex
             KeySchema:
               - AttributeName: username
                 KeyType: HASH
             Projection:
-              ProjectionType: KEYS_ONLY
+              ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1

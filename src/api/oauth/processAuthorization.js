@@ -1,7 +1,7 @@
 import uuid from 'uuid/v4';
 import { parse } from 'querystring';
 import { verifyCSRFToken } from '../../util/csrf';
-import { getLoggedInUser } from '../../util/account';
+import { getAccountByNameAndPassword } from '../../util/account';
 import dynamoDB from '../../util/dynamoDB';
 
 module.exports = async (event) => {
@@ -22,7 +22,7 @@ module.exports = async (event) => {
   } = parse(event.body);
 
   try {
-    const user = await getLoggedInUser(username, password);
+    const account = await getAccountByNameAndPassword(username, password);
     const code = uuid();
 
     await dynamoDB.put({
@@ -31,7 +31,7 @@ module.exports = async (event) => {
         id: code,
         ttl: Math.floor(Date.now() / 1000) + 60,
         clientId,
-        userId: user.id
+        accountId: account.id
       }
     });
 
@@ -42,6 +42,6 @@ module.exports = async (event) => {
       }
     };
   } catch (e) {
-    return { statusCode: 500 };
+    return { statusCode: 500, body: e.message };
   }
 };

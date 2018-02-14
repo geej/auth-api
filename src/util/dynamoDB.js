@@ -12,3 +12,4 @@ const dbPromise = (verb, query) => new Promise((resolve, reject) => dynamoDB[ver
 
 module.exports.get = (query) => dbPromise('get', query);
 module.exports.put = (query) => dbPromise('put', query);
+module.exports.query = (query) => dbPromise('query', query);
