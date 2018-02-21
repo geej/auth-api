@@ -1,3 +1,5 @@
+// This isn't used anywhere right now, but it's fun to have
+
 const crypto = require('crypto');
 const cipherKey = process.env.CIPHER_KEY;
 

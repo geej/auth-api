@@ -5,7 +5,6 @@ provider:
   environment:
     REGION: ${opt:region, self:provider.region}
     JWT_SECRET: ${opt:jwt_secret}
-    CIPHER_KEY: ${opt:cipher_key}
 
   iamRoleStatements:
     - Effect: Allow
@@ -38,12 +37,19 @@ functions:
         http:
           path: oauth/authorize
           method: post
-  token:
-    handler: dist/handler.token
+  generateToken:
+    handler: dist/handler.generateToken
     events:
       -
         http:
           path: oauth/token
+          method: post
+  tokenInfo:
+    handler: dist/handler.tokenInfo
+    events:
+      -
+        http:
+          path: oauth/token_info
           method: post
   createAccount:
     handler: dist/handler.createAccount

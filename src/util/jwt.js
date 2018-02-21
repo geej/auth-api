@@ -8,7 +8,7 @@ const signToken = (header, payload) => {
     .digest('base64'));
 }
 
-module.exports = (content) => {
+module.exports.getJWT = (content) => {
   const header = base64UrlSafe({
     alg: 'HS256',
     typ: 'JWT',
@@ -18,3 +18,9 @@ module.exports = (content) => {
 
   return [ header, payload, signToken(header, payload) ].join('.');
 };
+
+module.exports.validateJWT = (token) => {
+  const tokenParts = token.split('.');
+
+  return tokenParts.length === 3 && signToken(tokenParts[0], tokenParts[1]) === tokenParts[2];
+}

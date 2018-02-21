@@ -2,7 +2,7 @@ import { parse } from 'querystring';
 import { getAccountByNameAndPassword, getAccountById } from '../../util/account';
 import { isClientIdValid, isClientSecretValid } from '../../util/client';
 import dynamoDB from '../../util/dynamoDB';
-import jwt from "../../util/jwt";
+import { getJWT } from "../../util/jwt";
 
 const handleAuthorizationCodeGrant = async (code, providedClientId) => {
   const {
@@ -39,8 +39,7 @@ module.exports = async (event) => {
         statusCode: 401,
         body: JSON.stringify({
           error: 'Bad client credentials',
-          client_id,
-          client_secret
+          client_id
         })
       };
     }
@@ -68,20 +67,17 @@ module.exports = async (event) => {
       };
     }
 
-    account.auth = account.auth || {};
-    account.auth[client_id] = {
-      access_token: jwt({ id: account.id, username: account.username, email: account.email }),
-      expires_at: Date.now() + 604800000 // 7 days
-    };
-
-    await dynamoDB.put({
-      TableName: 'Accounts',
-      Item: account
-    });
+    const now = Date.now();
 
     return {
       statusCode: 200,
-      body: JSON.stringify(account.auth[client_id])
+      body: JSON.stringify({
+        access_token: getJWT({
+          id: account.id,
+          iat: now,
+          exp: now + 604800000, // 7 days,
+        }),
+      })
     };
   } catch (err) {
     return { statusCode: 500 };
