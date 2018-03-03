@@ -1,7 +1,9 @@
 const crypto = require('crypto');
 
 const makeUrlSafe = (text) => text.replace(/\+/g, '-').replace(/\//g, '_');
+const makeUrlUnsafe = (text) => text.replace(/-/g, '+').replace(/_/g, '/');
 const base64UrlSafe = (content) => makeUrlSafe(new Buffer(JSON.stringify(content)).toString('base64'));
+const base64UrlSafeDecode = (text) => JSON.parse(new Buffer(makeUrlUnsafe(text), 'base64').toString());
 const signToken = (header, payload) => {
   return makeUrlSafe(crypto.createHmac('sha256', new Buffer(process.env.JWT_SECRET))
     .update(`${ header }.${ payload }`)
@@ -22,5 +24,24 @@ module.exports.getJWT = (content) => {
 module.exports.validateJWT = (token) => {
   const tokenParts = token.split('.');
 
-  return tokenParts.length === 3 && signToken(tokenParts[0], tokenParts[1]) === tokenParts[2];
-}
+  if (tokenParts.length !== 3) {
+    return false;
+  }
+
+  const { exp } = base64UrlSafeDecode(tokenParts[1]);
+  if (exp < Date.now()) {
+    return false;
+  }
+
+  return signToken(tokenParts[0], tokenParts[1]) === tokenParts[2];
+};
+
+module.exports.readJWT = (token) => {
+  const tokenParts = token.split('.');
+
+  if (tokenParts.length !== 3) {
+    return false;
+  }
+
+  return base64UrlSafeDecode(tokenParts[1]);
+};
