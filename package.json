@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel src/ --out-dir dist/ --copy-files",
     "lint": "eslint src/**",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest src/"
   },
   "author": "geej",
   "license": "UNLICENSED",
@@ -15,11 +15,13 @@
     "handlebars": "^4.0.11"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.40",
-    "@babel/core": "^7.0.0-beta.40",
-    "@babel/preset-env": "^7.0.0-beta.40",
+    "@babel/cli": "^7.0.0-beta.46",
+    "@babel/core": "^7.0.0-beta.46",
+    "@babel/preset-env": "^7.0.0-beta.46",
+    "babel-core": "^7.0.0-bridge.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.11.0"
+    "eslint-plugin-import": "^2.11.0",
+    "jest": "^22.4.3"
   }
 }
