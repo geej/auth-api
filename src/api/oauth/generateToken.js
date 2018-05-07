@@ -1,25 +1,18 @@
 import { parse } from 'querystring';
-import { getAccountByNameAndPassword, getAccountById } from '../../util/account';
 import { isClientIdValid, isClientSecretValid } from '../../util/client';
-import dynamoDB from '../../util/dynamoDB';
 import { getJWT } from '../../util/jwt';
+import Account from '../../models/Account';
+import Code from '../../models/Code';
 
 const handleAuthorizationCodeGrant = async (code, providedClientId) => {
   const {
-    Item: {
-      clientId,
-      accountId,
-      ttl,
-    },
-  } = await dynamoDB.get({
-    TableName: 'Codes',
-    Key: {
-      id: code,
-    },
-  });
+    clientId,
+    accountId,
+    ttl,
+  } = await Code.getById(code);
 
   if (providedClientId === clientId && ttl > Math.floor(Date.now() / 1000)) {
-    return getAccountById(accountId);
+    return Account.getById(accountId);
   }
 
   return null;
@@ -49,7 +42,7 @@ module.exports = async (event) => {
     let account;
 
     switch (grantType) {
-      case 'password': account = await getAccountByNameAndPassword(username, password); break;
+      case 'password': account = await Account.getByUsernameAndPassword(username, password); break;
       case 'authorization_code': account = await handleAuthorizationCodeGrant(code, clientId); break;
       default:
         return {

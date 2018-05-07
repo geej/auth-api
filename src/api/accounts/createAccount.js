@@ -1,10 +1,7 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import uuid from 'uuid/v4';
 import { parse } from 'querystring';
-import { hash } from '../../util/crypt';
 import { verifyCSRFToken } from '../../util/csrf';
-import dynamoDB from '../../util/dynamoDB';
 import { isClientIdValid, isClientSecretValid } from '../../util/client';
+import Account from '../../models/Account';
 
 module.exports = async (event) => {
   const {
@@ -44,26 +41,15 @@ module.exports = async (event) => {
   }
 
   try {
-    const hashedPassword = await hash(password);
-
-    const item = {
-      id: uuid(),
+    const { id } = await Account.create({
       username,
-      password: hashedPassword,
+      password,
       email,
-    };
-
-    await dynamoDB.put({
-      TableName: 'Accounts',
-      Item: item,
-      ConditionExpression: 'attribute_not_exists(id)',
     });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        id: item.id,
-      }),
+      body: JSON.stringify({ id }),
     };
   } catch (err) {
     return { statusCode: 500 };
