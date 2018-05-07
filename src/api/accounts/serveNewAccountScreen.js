@@ -1,11 +1,11 @@
 import fs from 'fs';
-import Path from 'path';
+import path from 'path';
+import qs from 'querystring';
 import Handlebars from 'handlebars';
 import { getCSRFToken } from '../../util/csrf';
-import qs from 'querystring';
 
 module.exports = (event, context, callback) => {
-  fs.readFile(Path.join(__dirname, 'newAccountScreen.hbs'), (err, data) => {
+  fs.readFile(path.join(__dirname, 'newAccountScreen.hbs'), (err, data) => {
     if (err) {
       callback(err);
       return;
@@ -18,11 +18,11 @@ module.exports = (event, context, callback) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'text/html',
-        'Set-Cookie': `${ qs.stringify({ 'csrf-token': token }) }; Max-Age=300; Secure`
+        'Set-Cookie': `${qs.stringify({ 'csrf-token': token })}; Max-Age=300; Secure`,
       },
       body: template({
-        csrfToken: token
-      })
+        csrfToken: token,
+      }),
     });
   });
 };

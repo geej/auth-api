@@ -9,8 +9,8 @@ module.exports.getAccountByNameAndPassword = async (username, password) => {
     IndexName: 'AccountNameIndex',
     KeyConditionExpression: 'username = :username',
     ExpressionAttributeValues: {
-      ':username': username
-    }
+      ':username': username,
+    },
   });
 
   const account = items && items[0];
@@ -18,19 +18,18 @@ module.exports.getAccountByNameAndPassword = async (username, password) => {
 
   if (passwordHash === account.password) {
     return account;
-  } else {
-    throw new Error('Password does not match');
   }
+  throw new Error('Password does not match');
 };
 
 module.exports.getAccountById = async (id) => {
   const {
-    Item: account
+    Item: account,
   } = await dynamoDB.get({
     TableName: 'Accounts',
     Key: {
-      id
-    }
+      id,
+    },
   });
 
   return account;

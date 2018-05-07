@@ -1,28 +1,32 @@
-const fs = require('fs');
-const Path = require('path');
-const qs = require('querystring');
-const Handlebars = require('handlebars');
-const client = require('../../util/client');
-const csrf = require('../../util/csrf');
+import fs from 'fs';
+import path from 'path';
+import qs from 'querystring';
+import Handlebars from 'handlebars';
+import client from '../../util/client';
+import csrf from '../../util/csrf';
 
 module.exports = (event, context, callback) => {
   const {
     response_type: responseType,
     client_id: clientId,
-    redirect_uri: redirectUri
+    redirect_uri: redirectUri,
   } = event.queryStringParameters || {};
 
-  if(responseType !== 'code' || !client.isClientIdValid(clientId) || !client.isRedirectUriValid(clientId, redirectUri)) {
+  if (
+    responseType !== 'code' ||
+    !client.isClientIdValid(clientId) ||
+    !client.isRedirectUriValid(clientId, redirectUri)
+  ) {
     callback(null, {
       statusCode: 400,
       body: JSON.stringify({
-        error: 'Invalid query params'
-      })
+        error: 'Invalid query params',
+      }),
     });
     return;
   }
 
-  fs.readFile(Path.join(__dirname, 'authorizationScreen.hbs'), (err, data) => {
+  fs.readFile(path.join(__dirname, 'authorizationScreen.hbs'), (err, data) => {
     if (err) {
       callback(err);
       return;
@@ -35,13 +39,13 @@ module.exports = (event, context, callback) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'text/html',
-        'Set-Cookie': `${ qs.stringify({ 'csrf-token': token }) }; Max-Age=300; Secure`
+        'Set-Cookie': `${qs.stringify({ 'csrf-token': token })}; Max-Age=300; Secure`,
       },
       body: template({
         csrfToken: token,
         clientId,
-        redirectUri
-      })
+        redirectUri,
+      }),
     });
   });
 };

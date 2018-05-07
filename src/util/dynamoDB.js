@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import AWS from 'aws-sdk';
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: process.env.REGION });
@@ -10,6 +11,6 @@ const dbPromise = (verb, query) => new Promise((resolve, reject) => dynamoDB[ver
   }
 }));
 
-module.exports.get = (query) => dbPromise('get', query);
-module.exports.put = (query) => dbPromise('put', query);
-module.exports.query = (query) => dbPromise('query', query);
+module.exports.get = query => dbPromise('get', query);
+module.exports.put = query => dbPromise('put', query);
+module.exports.query = query => dbPromise('query', query);

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import uuid from 'uuid/v4';
 import { parse } from 'querystring';
 import { verifyCSRFToken } from '../../util/csrf';
@@ -9,8 +10,8 @@ module.exports = async (event) => {
     return {
       statusCode: 401,
       body: JSON.stringify({
-        error: 'CSRF token is not valid.'
-      })
+        error: 'CSRF token is not valid.',
+      }),
     };
   }
 
@@ -18,7 +19,7 @@ module.exports = async (event) => {
     redirectUri,
     clientId,
     username,
-    password
+    password,
   } = parse(event.body);
 
   try {
@@ -31,15 +32,15 @@ module.exports = async (event) => {
         id: code,
         ttl: Math.floor(Date.now() / 1000) + 60,
         clientId,
-        accountId: account.id
-      }
+        accountId: account.id,
+      },
     });
 
     return {
       statusCode: 302,
       headers: {
-        Location: `${ redirectUri }?code=${ code }`
-      }
+        Location: `${redirectUri}?code=${code}`,
+      },
     };
   } catch (e) {
     return { statusCode: 500, body: e.message };

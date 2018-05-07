@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import uuid from 'uuid/v4';
 import { parse } from 'querystring';
 import { hash } from '../../util/crypt';
@@ -7,29 +8,29 @@ import { isClientIdValid, isClientSecretValid } from '../../util/client';
 
 module.exports = async (event) => {
   const {
-    client_id,
-    client_secret,
+    client_id: clientId,
+    client_secret: clientSecret,
     username,
     password,
-    email
+    email,
   } = parse(event.body);
 
-  if (client_id && (!isClientIdValid(client_id) || !isClientSecretValid(client_id, client_secret))) {
+  if (clientId && (!isClientIdValid(clientId) || !isClientSecretValid(clientId, clientSecret))) {
     return {
       statusCode: 401,
       body: JSON.stringify({
         error: 'Bad client credentials',
-        client_id
-      })
+        client_id: clientId,
+      }),
     };
   }
 
-  if (!client_id && !verifyCSRFToken(event)) {
+  if (!clientId && !verifyCSRFToken(event)) {
     return {
       statusCode: 401,
       body: JSON.stringify({
-        error: 'CSRF token is not valid.'
-      })
+        error: 'CSRF token is not valid.',
+      }),
     };
   }
 
@@ -37,8 +38,8 @@ module.exports = async (event) => {
     return {
       statusCode: 400,
       body: JSON.stringify({
-        error: 'Not all registration parameters were provided.'
-      })
+        error: 'Not all registration parameters were provided.',
+      }),
     };
   }
 

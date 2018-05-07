@@ -1,6 +1,7 @@
 // This isn't used anywhere right now, but it's fun to have
 
-const crypto = require('crypto');
+import crypto from 'crypto';
+
 const cipherKey = process.env.CIPHER_KEY;
 
 module.exports.encrypt = (text) => {
@@ -14,7 +15,7 @@ module.exports.encrypt = (text) => {
   return {
     salt: salt.toString('base64'),
     iv: iv.toString('base64'),
-    value: Buffer.concat([ cipher.update(new Buffer(text)), cipher.final() ]).toString('base64'),
+    value: Buffer.concat([cipher.update(Buffer.from(text)), cipher.final()]).toString('base64'),
   };
 };
 
@@ -23,19 +24,15 @@ module.exports.decrypt = (value, salt, iv) => {
   const key = hash.slice(0, 32);
   const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'base64'));
 
-  return Buffer.concat([ decipher.update(Buffer.from(value, 'base64')), decipher.final() ]).toString();
+  return Buffer.concat([decipher.update(Buffer.from(value, 'base64')), decipher.final()]).toString();
 };
 
-module.exports.hash = (value, salt) => new Promise((res, rej) => {
-  if (!salt) {
-    salt = crypto.randomBytes(32).toString('base64');
-  }
-
+module.exports.hash = (value, salt = crypto.randomBytes(32).toString('base64')) => new Promise((res, rej) => {
   crypto.pbkdf2(value, salt, 10000, 412, 'sha512', (err, hash) => {
     if (err) {
       rej();
     } else {
       res(salt + hash.toString('base64'));
     }
-  })
+  });
 });
