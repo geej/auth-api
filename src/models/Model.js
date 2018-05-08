@@ -7,6 +7,10 @@ class Model {
   static secondaryIndices = [];
 
   static async getById(id) {
+    if (!this.tableName) {
+      throw new Error('tableName not defined!');
+    }
+
     const {
       Item: item,
     } = await dynamoDB.get({
@@ -20,6 +24,10 @@ class Model {
   }
 
   static async create(item) {
+    if (!this.tableName) {
+      throw new Error('tableName not defined!');
+    }
+
     const itemWithId = {
       id: uuid(),
       ...item,
@@ -34,7 +42,7 @@ class Model {
     return itemWithId;
   }
 
-  static getByHashAndRangeKeysGenerator(hashKey, rangeKey) {
+  static produceGetByHashAndRangeKeys(hashKey, rangeKey) {
     const secondaryIndex = this.secondaryIndices.find((index) => {
       if (rangeKey) {
         return index.hash === hashKey && index.range === rangeKey;
@@ -48,6 +56,10 @@ class Model {
     }
 
     return async (hash, range) => {
+      if (!this.tableName) {
+        throw new Error('tableName not defined!');
+      }
+
       const query = {
         TableName: this.tableName,
         IndexName: secondaryIndex.name,
@@ -61,8 +73,6 @@ class Model {
         query.KeyConditionExpression = `${hashKey} = :hash AND ${rangeKey} = :range`;
         query.ExpressionAttributeValues[':range'] = range;
       }
-
-      console.log('query', query);
 
       const {
         Items: items,
@@ -88,6 +98,6 @@ module.exports = new Proxy(Model, {
       rangeField,
     ] = path.slice(5).split('And').map(string => string.charAt(0).toLowerCase() + string.slice(1));
 
-    return receiver.getByHashAndRangeKeysGenerator(hashField, rangeField);
+    return receiver.produceGetByHashAndRangeKeys(hashField, rangeField);
   },
 });
