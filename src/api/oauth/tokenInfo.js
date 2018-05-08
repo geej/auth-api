@@ -1,6 +1,6 @@
 import { parse } from 'querystring';
 import { isClientIdValid, isClientSecretValid } from '../../util/client';
-import { validateJWT, readJWT } from '../../util/jwt';
+import JWT from '../../util/jwt';
 
 module.exports = async (event) => {
   const {
@@ -19,14 +19,16 @@ module.exports = async (event) => {
     };
   }
 
-  if (validateJWT(accessToken)) {
+  try {
+    const token = JWT.from(accessToken);
     return {
       statusCode: 200,
-      body: JSON.stringify(readJWT(accessToken)),
+      body: JSON.stringify(token.payload),
+    };
+
+  } catch (e) {
+    return {
+      statusCode: 403,
     };
   }
-
-  return {
-    statusCode: 403,
-  };
 };

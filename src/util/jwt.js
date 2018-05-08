@@ -8,18 +8,7 @@ const signToken = (header, payload) => makeUrlSafe(crypto.createHmac('sha256', B
   .update(`${header}.${payload}`)
   .digest('base64'));
 
-module.exports.getJWT = (content) => {
-  const header = base64UrlSafe({
-    alg: 'HS256',
-    typ: 'JWT',
-  });
-
-  const payload = base64UrlSafe(Object.assign({ iss: 'x0r.net' }, content));
-
-  return [header, payload, signToken(header, payload)].join('.');
-};
-
-module.exports.validateJWT = (token) => {
+const validateToken = (token) => {
   const tokenParts = token.split('.');
 
   if (tokenParts.length !== 3) {
@@ -34,12 +23,41 @@ module.exports.validateJWT = (token) => {
   return signToken(tokenParts[0], tokenParts[1]) === tokenParts[2];
 };
 
-module.exports.readJWT = (token) => {
-  const tokenParts = token.split('.');
+module.exports = class JWT {
+  static from(token = '') {
+    const tokenParts = token.split('.');
 
-  if (tokenParts.length !== 3) {
-    return false;
+    if (!validateToken(token)) {
+      throw new Error('Unable to validate encoded token.');
+    }
+
+    const header = base64UrlSafeDecode(tokenParts[0]);
+    const payload = base64UrlSafeDecode(tokenParts[1]);
+
+    return new JWT(payload, header);
   }
 
-  return base64UrlSafeDecode(tokenParts[1]);
-};
+  constructor(
+    payload = {},
+    header = {
+      alg: 'HS256',
+      typ: 'JWT',
+    }
+  ) {
+    this.payload = payload;
+    this.header = header;
+  }
+
+  toString() {
+    const payload = base64UrlSafe(
+      {
+        iss: process.env.JWT_ISSUER,
+        ...this.payload,
+      }
+    );
+
+    const header = base64UrlSafe(this.header);
+
+    return [header, payload, signToken(header, payload)].join('.');
+  }
+}

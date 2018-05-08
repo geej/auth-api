@@ -1,6 +1,6 @@
 import { parse } from 'querystring';
 import { isClientIdValid, isClientSecretValid } from '../../util/client';
-import { getJWT } from '../../util/jwt';
+import JWT from '../../util/jwt';
 import Account from '../../models/Account';
 import Code from '../../models/Code';
 
@@ -63,15 +63,16 @@ module.exports = async (event) => {
     }
 
     const now = Date.now();
+    const token = new JWT({
+      id: account.id,
+      iat: now,
+      exp: now + 604800000, // 7 days,
+    });
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        access_token: getJWT({
-          id: account.id,
-          iat: now,
-          exp: now + 604800000, // 7 days,
-        }),
+        access_token: token.toString(),
       }),
     };
   } catch (err) {
