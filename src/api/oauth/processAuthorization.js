@@ -1,7 +1,7 @@
 import { parse } from 'querystring';
 import { verifyCSRFToken } from '../../util/csrf';
-import { getAccountByNameAndPassword } from '../../models/Account';
-import Code from '../../models/Code';
+import Account from '../../models/Account';
+import JWT from '../../util/jwt';
 
 module.exports = async (event) => {
   if (!verifyCSRFToken(event)) {
@@ -21,19 +21,21 @@ module.exports = async (event) => {
   } = parse(event.body);
 
   try {
-    const account = await getAccountByNameAndPassword(username, password);
+    const account = await Account.getByUsernameAndPassword(username, password);
 
-    const {
-      id,
-    } = await Code.create({
-      clientId,
-      accountId: account.id,
+    const now = Date.now();
+    const token = new JWT({
+      id: account.id,
+      client_id: clientId,
+      sub: 'code',
+      iat: now,
+      exp: now + 300000, // 5 minutes,
     });
 
     return {
       statusCode: 302,
       headers: {
-        Location: `${redirectUri}?code=${id}`,
+        Location: `${redirectUri}?code=${token.toString()}`,
       },
     };
   } catch (e) {

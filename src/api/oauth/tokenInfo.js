@@ -25,7 +25,6 @@ module.exports = async (event) => {
       statusCode: 200,
       body: JSON.stringify(token.payload),
     };
-
   } catch (e) {
     return {
       statusCode: 403,

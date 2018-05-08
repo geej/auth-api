@@ -4,6 +4,7 @@ provider:
   runtime: nodejs6.10
   environment:
     REGION: ${opt:region, self:provider.region}
+    JWT_ISSUER: ${opt:jwt_issuer}
     JWT_SECRET: ${opt:jwt_secret}
 
   iamRoleStatements:
@@ -16,7 +17,7 @@ provider:
       Action:
         - dynamodb:GetItem
         - dynamodb:PutItem
-      Resource: arn:aws:dynamodb:*:*:table/Codes
+      Resource: arn:aws:dynamodb:*:*:table/Clients
     - Effect: Allow
       Action:
         - dynamodb:Query
@@ -67,23 +68,6 @@ functions:
           method: get
 resources:
   Resources:
-    Codes:
-      Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
-      Properties:
-        TimeToLiveSpecification:
-          AttributeName: ttl
-          Enabled: true
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: Codes
     Accounts:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain

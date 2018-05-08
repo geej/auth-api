@@ -42,22 +42,20 @@ module.exports = class JWT {
     header = {
       alg: 'HS256',
       typ: 'JWT',
-    }
+    },
   ) {
     this.payload = payload;
     this.header = header;
   }
 
   toString() {
-    const payload = base64UrlSafe(
-      {
-        iss: process.env.JWT_ISSUER,
-        ...this.payload,
-      }
-    );
+    const payload = base64UrlSafe({
+      iss: process.env.JWT_ISSUER,
+      ...this.payload,
+    });
 
     const header = base64UrlSafe(this.header);
 
     return [header, payload, signToken(header, payload)].join('.');
   }
-}
+};

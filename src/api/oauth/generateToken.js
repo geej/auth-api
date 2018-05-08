@@ -2,17 +2,16 @@ import { parse } from 'querystring';
 import { isClientIdValid, isClientSecretValid } from '../../util/client';
 import JWT from '../../util/jwt';
 import Account from '../../models/Account';
-import Code from '../../models/Code';
 
-const handleAuthorizationCodeGrant = async (code, providedClientId) => {
+const handleAuthorizationCodeGrant = async (code, rawClientId) => {
   const {
-    clientId,
-    accountId,
-    ttl,
-  } = await Code.getById(code);
+    client_id: clientId,
+    exp,
+    id,
+  } = JWT.from(code);
 
-  if (providedClientId === clientId && ttl > Math.floor(Date.now() / 1000)) {
-    return Account.getById(accountId);
+  if (clientId === rawClientId && exp < Date.now()) {
+    return Account.getById(id);
   }
 
   return null;
@@ -65,6 +64,8 @@ module.exports = async (event) => {
     const now = Date.now();
     const token = new JWT({
       id: account.id,
+      client_id: clientId,
+      sub: 'access_token',
       iat: now,
       exp: now + 604800000, // 7 days,
     });
