@@ -1,7 +1,16 @@
 // eslint-disable-next-line
 import AWS from 'aws-sdk';
 
-const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: process.env.REGION });
+const config = {
+  region: process.env.REGION,
+};
+
+if (process.env.IS_OFFLINE) {
+  config.region = 'localhost';
+  config.endpoint = 'http://localhost:8000';
+}
+
+const dynamoDB = new AWS.DynamoDB.DocumentClient(config);
 
 const dbPromise = (verb, query) => new Promise((resolve, reject) => dynamoDB[verb](query, (err, data) => {
   if (err) {

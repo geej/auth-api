@@ -26,7 +26,9 @@
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",
-    "jest": "^22.4.3"
+    "jest": "^22.4.3",
+    "serverless-dynamodb-local": "^0.2.30",
+    "serverless-offline": "^3.20.3"
   },
   "jest": {
     "coverageDirectory": "test/coverage",

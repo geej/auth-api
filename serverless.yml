@@ -109,3 +109,13 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: Clients
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+custom:
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
