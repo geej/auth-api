@@ -1,23 +1,11 @@
 import { parse } from 'querystring';
-import { isClientIdValid, isClientSecretValid } from '../../util/client';
 import JWT from '../../util/jwt';
+import { verifiesClientCredentials } from '../../util/client';
 
-module.exports = async (event) => {
+const handler = async (event) => {
   const {
-    client_id: clientId,
-    client_secret: clientSecret,
     access_token: accessToken,
   } = parse(event.body);
-
-  if (!isClientIdValid(clientId) || !isClientSecretValid(clientId, clientSecret)) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({
-        error: 'Bad client credentials',
-        client_id: clientId,
-      }),
-    };
-  }
 
   try {
     const token = JWT.from(accessToken);
@@ -31,3 +19,5 @@ module.exports = async (event) => {
     };
   }
 };
+
+module.exports = verifiesClientCredentials(handler);

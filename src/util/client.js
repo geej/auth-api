@@ -1,8 +1,28 @@
-import config from '../config';
+import Client from '../models/Client';
 
-module.exports.isClientIdValid = clientId => Object.keys(config.clients).indexOf(clientId) !== -1;
+module.exports.verifiesClientCredentials = handler => async (event) => {
+  try {
+    const {
+      client_id: clientId,
+      client_secret: clientSecret,
+    } = parse(event.body);
 
-module.exports.isRedirectUriValid = (clientId, redirectUri) =>
-  config.clients[clientId].redirectUris.indexOf(redirectUri) !== -1;
+    const client = await Client.getById(clientId);
+    if (!client || client.secret !== clientSecret) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({
+          error: 'Bad client credentials',
+          client_id: clientId,
+        }),
+      };
+    }
 
-module.exports.isClientSecretValid = (clientId, clientSecret) => config.clients[clientId].secret === clientSecret;
+    return handler({
+      ...event,
+      clientId,
+    });
+  } catch (e) {
+    return { statusCode: 500 };
+  }
+}

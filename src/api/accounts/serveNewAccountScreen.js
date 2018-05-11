@@ -18,7 +18,7 @@ module.exports = (event, context, callback) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'text/html',
-        'Set-Cookie': `${qs.stringify({ 'csrf-token': token })}; Max-Age=300; Secure`,
+        'Set-Cookie': `${qs.stringify({ 'csrf-token': token })}; Max-Age=300`,
       },
       body: template({
         csrfToken: token,

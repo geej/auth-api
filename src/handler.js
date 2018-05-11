@@ -4,7 +4,7 @@ const wrapHandler = fn => (event, context, callback) => {
     .catch(e => callback(e));
 };
 
-module.exports.createAccount = wrapHandler(require('./api/accounts/createAccount'));
+module.exports.createAccount = wrapHandler(require('./api/accounts/create'));
 module.exports.serveNewAccountScreen = require('./api/accounts/serveNewAccountScreen');
 
 module.exports.generateToken = wrapHandler(require('./api/oauth/generateToken'));

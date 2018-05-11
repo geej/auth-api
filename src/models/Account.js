@@ -9,6 +9,25 @@ module.exports = class Account extends Model {
       hash: 'username',
     },
   ];
+  static schema = {
+    title: 'Account',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+      },
+      username: {
+        type: 'string',
+      },
+      password: {
+        type: 'string',
+      },
+      email: {
+        type: 'string',
+      },
+    },
+    required: [ 'id', 'username', 'password', 'email' ],
+  };
 
   static async create(user) {
     const completeUser = {
@@ -23,7 +42,7 @@ module.exports = class Account extends Model {
     const accounts = await this.getByUsername(username);
     const account = accounts && accounts[0];
 
-    if (!account || !account.password) {
+    if (!account) {
       return null;
     }
 

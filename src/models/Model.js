@@ -1,10 +1,21 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import uuid from 'uuid/v4';
+import Ajv from 'ajv';
 import dynamoDB from '../util/dynamoDB';
 
 class Model {
   static tableName = null;
   static secondaryIndices = [];
+  static schema = {
+    title: 'Model',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+      },
+    },
+    required: [ 'id' ],
+  };
 
   static async getById(id) {
     if (!this.tableName) {
@@ -33,6 +44,10 @@ class Model {
       ...item,
     };
 
+    if (!this.validateObject(itemWithId, true)) {
+      throw new Error(`Input object does not match schema for ${this.tableName}`);
+    }
+
     await dynamoDB.put({
       TableName: this.tableName,
       Item: itemWithId,
@@ -41,6 +56,19 @@ class Model {
 
     return itemWithId;
   }
+
+  static validateObject(inputObject, prune = false) {
+    const ajv = new Ajv({ removeAdditional: true });
+
+    const schema = {
+      ...this.schema,
+      additionalProperties: prune ? false : undefined,
+    };
+
+    const validate = ajv.compile(schema);
+
+    return validate(inputObject) ? inputObject : false;
+  };
 
   static produceGetByHashAndRangeKeys(hashKey, rangeKey) {
     const secondaryIndex = this.secondaryIndices.find((index) => {

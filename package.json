@@ -8,11 +8,12 @@
     "lint": "eslint src/**",
     "test": "jest src/",
     "watch": "nodemon --watch src --exec npm start",
-    "start": "npm run build && sls offline --jwt_issuer ${JWT_ISSUER} --jwt_secret ${JWT_SECRET}"
+    "start": "npm run build && sls offline start --jwt_issuer ${JWT_ISSUER} --jwt_secret ${JWT_SECRET}"
   },
   "author": "geej",
   "license": "UNLICENSED",
   "dependencies": {
+    "ajv": "^6.5.0",
     "cookie": "^0.3.1",
     "handlebars": "^4.0.11"
   },

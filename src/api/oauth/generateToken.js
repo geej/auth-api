@@ -1,7 +1,7 @@
 import { parse } from 'querystring';
-import { isClientIdValid, isClientSecretValid } from '../../util/client';
 import JWT from '../../util/jwt';
 import Account from '../../models/Account';
+import { verifiesClientCredentials } from '../../util/client';
 
 const handleAuthorizationCodeGrant = async (code, rawClientId) => {
   const {
@@ -17,32 +17,21 @@ const handleAuthorizationCodeGrant = async (code, rawClientId) => {
   return null;
 };
 
-module.exports = async (event) => {
+const handler = async (event) => {
   const {
     username,
     password,
-    client_id: clientId,
-    client_secret: clientSecret,
     grant_type: grantType,
     code,
   } = parse(event.body);
 
   try {
-    if (!isClientIdValid(clientId) || !isClientSecretValid(clientId, clientSecret)) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({
-          error: 'Bad client credentials',
-          client_id: clientId,
-        }),
-      };
-    }
-
     let account;
 
     switch (grantType) {
+      // TODO: Password is broken
       case 'password': account = await Account.getByUsernameAndPassword(username, password); break;
-      case 'authorization_code': account = await handleAuthorizationCodeGrant(code, clientId); break;
+      case 'authorization_code': account = await handleAuthorizationCodeGrant(code, event.clientId); break;
       default:
         return {
           statusCode: 400,
@@ -64,7 +53,7 @@ module.exports = async (event) => {
     const now = Date.now();
     const token = new JWT({
       id: account.id,
-      client_id: clientId,
+      client_id: event.clientId,
       sub: 'access_token',
       iat: now,
       exp: now + 604800000, // 7 days,
@@ -80,3 +69,5 @@ module.exports = async (event) => {
     return { statusCode: 500 };
   }
 };
+
+module.exports = verifiesClientCredentials(handler);

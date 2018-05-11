@@ -1,18 +1,9 @@
 import { parse } from 'querystring';
-import { verifyCSRFToken } from '../../util/csrf';
+import { verifiesCSRFToken } from '../../util/csrf';
 import Account from '../../models/Account';
 import JWT from '../../util/jwt';
 
-module.exports = async (event) => {
-  if (!verifyCSRFToken(event)) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({
-        error: 'CSRF token is not valid.',
-      }),
-    };
-  }
-
+const handler = async (event) => {
   const {
     redirectUri,
     clientId,
@@ -42,3 +33,5 @@ module.exports = async (event) => {
     return { statusCode: 500, body: e.message };
   }
 };
+
+module.exports = verifiesCSRFToken(handler);
