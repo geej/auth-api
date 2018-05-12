@@ -5,9 +5,9 @@ const wrapHandler = fn => (event, context, callback) => {
 };
 
 module.exports.createAccount = wrapHandler(require('./api/accounts/create'));
-module.exports.serveNewAccountScreen = require('./api/accounts/serveNewAccountScreen');
+module.exports.serveNewAccountScreen = wrapHandler(require('./api/accounts/serveNewAccountScreen'));
 
 module.exports.generateToken = wrapHandler(require('./api/oauth/generateToken'));
 module.exports.tokenInfo = wrapHandler(require('./api/oauth/tokenInfo'));
-module.exports.serveAuthorizationScreen = require('./api/oauth/serveAuthorizationScreen');
+module.exports.serveAuthorizationScreen = wrapHandler(require('./api/oauth/serveAuthorizationScreen'));
 module.exports.processAuthorization = wrapHandler(require('./api/oauth/processAuthorization'));

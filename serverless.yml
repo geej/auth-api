@@ -111,8 +111,9 @@ resources:
         TableName: Clients
 package:
   exclude:
-    - src/**
-    - test/**
+    - ./**
+  include:
+    - dist/handler.js
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
