@@ -12,14 +12,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         loader: 'babel-loader',
       },
-      {
-        test: /\.hbs$/,
-        loader: 'handlebars-loader',
-      },
     ],
+  },
+  resolve: {
+    extensions: [ '.js', '.jsx' ],
   },
   externals: {
     'aws-sdk': 'commonjs aws-sdk',

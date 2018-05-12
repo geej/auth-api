@@ -17,12 +17,15 @@ module.exports = class Account extends Model {
         type: 'string',
       },
       username: {
+        title: 'Username',
         type: 'string',
       },
       password: {
+        title: 'Password',
         type: 'string',
       },
       email: {
+        title: 'E-mail',
         type: 'string',
       },
     },

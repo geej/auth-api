@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import uuid from 'uuid/v4';
-import Ajv from 'ajv';
+// import Ajv from 'ajv';
 import dynamoDB from '../util/dynamoDB';
 
 class Model {
@@ -44,9 +44,9 @@ class Model {
       ...item,
     };
 
-    if (!this.validateObject(itemWithId, true)) {
-      throw new Error(`Input object does not match schema for ${this.tableName}`);
-    }
+    // if (!this.validateObject(itemWithId, true)) {
+    //   throw new Error(`Input object does not match schema for ${this.tableName}`);
+    // }
 
     await dynamoDB.put({
       TableName: this.tableName,
@@ -57,18 +57,18 @@ class Model {
     return itemWithId;
   }
 
-  static validateObject(inputObject, prune = false) {
-    const ajv = new Ajv({ removeAdditional: true });
-
-    const schema = {
-      ...this.schema,
-      additionalProperties: prune ? false : undefined,
-    };
-
-    const validate = ajv.compile(schema);
-
-    return validate(inputObject) ? inputObject : false;
-  };
+  // static validateObject(inputObject, prune = false) {
+  //   const ajv = new Ajv({ removeAdditional: true });
+  //
+  //   const schema = {
+  //     ...this.schema,
+  //     additionalProperties: prune ? false : undefined,
+  //   };
+  //
+  //   const validate = ajv.compile(schema);
+  //
+  //   return validate(inputObject) ? inputObject : false;
+  // };
 
   static produceGetByHashAndRangeKeys(hashKey, rangeKey) {
     const secondaryIndex = this.secondaryIndices.find((index) => {

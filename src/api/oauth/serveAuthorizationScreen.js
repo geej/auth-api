@@ -1,8 +1,8 @@
 import qs from 'querystring';
 import Client from '../../models/Client';
 import csrf from '../../util/csrf';
-import template from './authorizationScreen.hbs';
-
+//import template from './authorizationScreen.hbs';
+const template = () => '';
 module.exports = async (event) => {
   const {
     response_type: responseType,
