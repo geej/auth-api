@@ -1,7 +1,7 @@
 import { hash } from '../util/crypt';
-import Model from './Model';
+import Model from 'framework/dist/model/Model';
 
-module.exports = class Account extends Model {
+export default class Account extends Model {
   static tableName = 'Accounts';
   static secondaryIndices = [
     {

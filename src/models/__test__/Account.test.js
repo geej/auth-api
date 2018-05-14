@@ -7,7 +7,7 @@ describe('Account', () => {
       hash: () => Promise.resolve('hashedPassword')
     }));
 
-    jest.mock('../../util/dynamoDB', () => ({
+    jest.mock('framework/dist/model/util/dynamoDB', () => ({
       get: jest.fn().mockReturnValue(Promise.resolve({
         Item: {}
       })),
@@ -23,7 +23,7 @@ describe('Account', () => {
     }));
 
     Account = require('../Account');
-    dynamoDB = require('../../util/dynamoDB');
+    dynamoDB = require('framework/dist/model/util/dynamoDB');
   });
 
   it('has a tableName and one secondary index', () => {

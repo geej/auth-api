@@ -1,6 +1,4 @@
-import render from 'preact-render-to-string';
-
-module.exports = ({ children, title }) => `
+module.exports = (children, { title }) => `
   <!doctype html>
   <html>
     <head>
@@ -20,7 +18,7 @@ module.exports = ({ children, title }) => `
         </style>
     </head>
     <body>
-      ${render(children)}
+      ${children}
     </body>
   </html>
 `;

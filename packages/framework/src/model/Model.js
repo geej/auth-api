@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import uuid from 'uuid/v4';
 // import Ajv from 'ajv';
-import dynamoDB from '../util/dynamoDB';
+import dynamoDB from './util/dynamoDB';
 
 class Model {
   static tableName = null;
@@ -111,8 +111,13 @@ class Model {
   }
 }
 
-module.exports = new Proxy(Model, {
+export default new Proxy(Model, {
   get(object, path, receiver) {
+    // Node wants to inspect this but it just sends us for a loop
+    if (typeof path === 'symbol'){
+      return;
+    }
+
     if (object[path]) {
       return object[path];
     }

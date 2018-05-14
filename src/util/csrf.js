@@ -23,4 +23,25 @@ module.exports.verifiesCSRFToken = handler => async (event) => {
   } catch (e) {
     return badCSRFResponse;
   }
-}
+};
+
+module.exports.verifiesCSRFToken2 = function(target, key, descriptor) {
+  const original = descriptor.value;
+
+  descriptor.value = function (context, event) {
+    try {
+      const cookies = event.headers && event.headers.Cookie ? cookie.parse(event.headers.Cookie) : {};
+      const postParams = event.body && qs.parse(event.body);
+
+      if (cookies['csrf-token'] === postParams.csrfToken) {
+        return original.apply(context, [ event ]);
+      } else {
+        return badCSRFResponse;
+      }
+    } catch (e) {
+      return badCSRFResponse;
+    }
+  };
+
+  return descriptor;
+};

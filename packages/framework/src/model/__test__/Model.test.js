@@ -12,7 +12,7 @@ describe('Model', () => {
       }))
     }));
     Model = require('../Model');
-    dynamoDB = require('../../util/dynamoDB');
+    dynamoDB = require('../util/dynamoDB');
   });
 
   describe('getById', () => {

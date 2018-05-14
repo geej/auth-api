@@ -1,6 +1,6 @@
-import Model from './Model';
+import Model from 'framework/dist/model/Model';
 
-module.exports = class Client extends Model {
+export default class Client extends Model {
   static tableName = 'Clients';
   static schema = {
     title: 'Client',

@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   target: 'node',
   entry: './src/handler.js',
   output: {
@@ -14,6 +14,10 @@ module.exports = {
       {
         test: /\.jsx?$/,
         loader: 'babel-loader',
+        exclude: [
+          /node_modules/,
+          /packages/,
+        ]
       },
     ],
   },
